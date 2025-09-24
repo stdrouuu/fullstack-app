@@ -1,6 +1,6 @@
 <?php
 
-//php artisan make:model Role -m
+// php artisan make:model Role -m
 
 namespace App\Models;
 
