@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('name'); 
             $table->text('description'); 
             $table->integer('price', 10, 2); 
-            $table->unsignedBigInteger('category_id'); //relasi dengan tabel category
+            $table->unsignedBigInteger('category_id'); //relasi tabel items dengan tabel category
             $table->string('img')->nullable(); 
             $table->boolean('is_active')->default(true); //item aktif atau tidak
             $table->softDeletes();

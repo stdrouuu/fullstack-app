@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('fullname');
             $table->string('email')->unique()->fillable();
             $table->string('phone');
-            $table->unsignedBigInteger('role_id'); //relasi dengan tabel role
+            $table->unsignedBigInteger('role_id'); //relasi tabel users dengan tabel roles
             $table->softDeletes(); //datanya tdk terhapus secara permanen 
             $table->timestamps();
 
