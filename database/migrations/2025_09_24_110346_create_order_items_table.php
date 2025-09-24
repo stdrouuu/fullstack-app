@@ -14,6 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('item_id'); //relasi tabel order_items dengan tabel items
             $table->integer('quantity');
             $table->integer('price');
+            $table->integer('tax');
             $table->integer('total_price'); 
             $table->timestamps();
             $table->softDeletes();

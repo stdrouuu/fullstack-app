@@ -16,9 +16,6 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-
-        DB::table('roles')->insert($roles);
-        //----------------
     }
 
 

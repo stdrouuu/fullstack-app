@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); 
             $table->text('description'); 
-            $table->integer('price', 10, 2); 
+            $table->integer('price'); 
             $table->unsignedBigInteger('category_id'); //relasi tabel items dengan tabel category
             $table->string('img')->nullable(); 
             $table->boolean('is_active')->default(true); //item aktif atau tidak
