@@ -14,11 +14,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class, //seeder role
-            CategorySeeder::class, //seeder category
+            // RoleSeeder::class, //seeder role
+            // CategorySeeder::class, //seeder category
             ItemSeeder::class, //factory item
-            UserSeeder::class, //factory user
+            // UserSeeder::class, //factory user
         ]);
     }
-    // php artisan db:seed => generate random data from seeder
+    // php artisan db:seed => push img to database, generate random data from seeder
 }
