@@ -16,7 +16,7 @@
         @yield('content')
 
         <!-- Footer Start -->
-         @include('customer.layouts.__footer')
+        @include('customer.layouts.__footer')
         <!-- Footer End -->
 
 
