@@ -13,11 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            RoleSeeder::class, //seeder role
+            CategorySeeder::class, //seeder category
+            ItemSeeder::class, //factory item
+            UserSeeder::class, //factory user
         ]);
     }
+    // php artisan db:seed => generate random data from seeder
 }
