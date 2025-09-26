@@ -7,13 +7,10 @@ Route::get('/', function () {
     return redirect()->route('menu');
 });
 
-route::get('/menu', [MenuController::class, 'index'])->name('menu');
-
-Route::get('/cart', function () {
-    return view('customer.cart');
-})->name('cart');
-
+Route::get('/menu', [MenuController::class, 'index'])->name('menu');
+Route::get('/cart', [MenuController::class, 'cart'])->name('cart');
+Route::post('/cart/add', [MenuController::class, 'addToCart'])->name('cart.add');
 
 Route::get('/checkout', function () {
     return view('customer.cart');
-})->name('cart');
+})->name('checkout');

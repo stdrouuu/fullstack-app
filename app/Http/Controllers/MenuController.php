@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Models\Item;
 
+
 class MenuController extends Controller
 {
     public function index(Request $request)
@@ -21,5 +22,47 @@ class MenuController extends Controller
         //ambil data yang is_active/1 + urutkan berdasarkan name secara ascending
 
         return view('customer.menu', compact('items', 'tableNumber')); //kirim data items ke view customer.menu
+    }
+
+    public function cart() //untuk menyimpan data cart di session pada saat customer menekan tombol add to cart
+    {
+        $cart = Session::get('cart', []);
+        return view('customer.cart', compact('cart'));
+    }
+
+    public function addToCart(Request $request)
+    {
+        $menuId = $request->input('id'); //ambil id dari request
+        $menu = Item::find($menuId); //cari menu berdasarkan id
+
+        if (!$menu) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Menu tidak ditemukan'
+            ]);
+        }
+
+        $cart = Session::get('cart');
+
+        //cek apakah cart kosong atau tidak
+        if(isset($cart[$menuId])) { 
+            $cart[$menuId]['qty'] += 1;
+        } else {
+            $cart[$menuId] = [
+                'id' => $menu->id,
+                'name' => $menu->name,
+                'price' => $menu->price,
+                'image' => $menu->img,
+                'qty' => 1
+            ];
+        }
+
+        Session::put('cart', $cart);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berhasil ditambahkan ke keranjang',
+            'cart' => $cart
+        ]);
     }
 }
