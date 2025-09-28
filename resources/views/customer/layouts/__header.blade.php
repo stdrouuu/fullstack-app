@@ -24,6 +24,9 @@
         <!-- Customized Bootstrap Stylesheet -->
         <link href="{{ asset('assets/customer/css/bootstrap.min.css') }}" rel="stylesheet">
 
+        <!-- SweetAlert2 -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
         <!-- Template Stylesheet -->
         <link href="{{ asset('assets/customer/css/style.css') }}" rel="stylesheet">
     </head>

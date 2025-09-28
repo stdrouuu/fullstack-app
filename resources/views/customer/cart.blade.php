@@ -59,16 +59,19 @@
                                 <td>
                                     <div class="input-group quantity mt-4" style="width: 100px;">
                                         <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                            {{-- Ketika diklik akan mengurangi qty -1 --}}
+                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border" onclick="updateQuantity('{{ $item['id'] }}', -1)">
                                                 <i class="fa fa-minus"></i>
                                             </button>
                                         </div>
-                                        <input type="text" 
-                                            class="form-control form-control-sm text-center border-0" 
+                                        <input id="qty-{{ $item['id'] }}"
+                                            type="text" 
+                                            class="form-control form-control-sm text-center border-0 bg-transparent" 
                                             value="{{ $item['qty'] }}" 
                                             readonly>
                                         <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                            {{-- Ketika diklik akan menambahkan qty +1 --}}
+                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border" onclick="updateQuantity('{{ $item['id'] }}', 1)"">
                                                 <i class="fa fa-plus"></i>
                                             </button>
                                         </div>
@@ -78,7 +81,9 @@
                                     <p class="mb-0 mt-4">{{ 'Rp'. number_format($item['price'] * $item['qty'], 0, ',','.') }}</p>
                                 </td>
                                 <td>
-                                    <button class="btn btn-md rounded-circle bg-light border mt-4">
+                                    {{-- Ketika diklik akan menghapus item dari cart --}}
+                                    <button class="btn btn-md rounded-circle bg-light border mt-4"
+                                        onclick="confirmRemoveItem('{{ $item['id'] }}')">
                                         <i class="fa fa-times text-danger"></i>
                                     </button>
                                 </td>
@@ -131,4 +136,72 @@
 
     </div>
 </div>
-@endsection           
+@endsection  
+
+
+@section('script')
+<script>
+
+    // function untuk tambah item ke keranjang
+    function updateQuantity(itemId, change) {
+        var qtyInput = document.getElementById('qty-' + itemId);
+        var currentQty = parseInt(qtyInput.value);
+        var newQty = currentQty + change;
+
+        if (newQty <= 0) {
+            if (confirm('Apakah anda yakin ingin menghapus item ini?')) {
+                removeItemFromCart(itemId);
+            }
+            return;
+        }
+
+        fetch("{{ route('cart.update') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ id: itemId, qty: newQty })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                qtyInput.value = newQty;
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat mengupdate keranjang');
+        });
+    }
+
+    // function untuk konfirmasi delete item + delete item dari keranjang pakai sweetalert2
+    function confirmRemoveItem(itemId) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Item ini akan dihapus dari keranjang!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                removeItemFromCart(itemId);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Item berhasil dihapus dari keranjang.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+</script>
+@endsection

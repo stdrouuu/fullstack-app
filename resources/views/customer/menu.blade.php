@@ -71,11 +71,24 @@
                 body: JSON.stringify({ id: menuId })
             })
             .then(response => response.json())
+            
+            //sweetalert success
             .then(data => {
-                alert(data.message)
-            })
-            .catch((error) => {
-                console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 1200
+                    });
+                })
+            .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops..',
+                        text: 'Terjadi kesalahan, coba lagi!',
+                    });
+                    console.error("Error:", error);
             });
         }
     </script>

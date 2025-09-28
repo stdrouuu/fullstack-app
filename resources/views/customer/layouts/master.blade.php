@@ -32,6 +32,7 @@
     <script src="{{ asset('assets/customer/lib/waypoints/waypoints.min.js') }}"></script>
     <script src="{{ asset('assets/customer/lib/lightbox/js/lightbox.min.js') }}"></script>
     <script src="{{ asset('assets/customer/lib/owlcarousel/owl.carousel.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Template Javascript -->
     <script src="{{ asset('assets/customer/js/main.js') }}"></script>
