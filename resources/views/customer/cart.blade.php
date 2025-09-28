@@ -10,6 +10,13 @@
             </div>
         @endif
 
+        @if (session('danger'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('danger') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         @if (empty($cart))
             <div class="text-center py-5">
                 <img src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png" alt="Empty Cart" style="width:100px; height:100px; margin-bottom:20px;">
@@ -98,6 +105,15 @@
                 $total = $subTotal + $tax;
             @endphp
 
+            <div class="d-flex justify-content-end">
+                <a 
+                href="{{ route('cart.clear') }}" 
+                class="btn btn-danger" 
+                onclick="return confirmClearCart()">
+                Kosongkan Keranjang
+                </a>
+            </div>
+
             <div class="row g-4 justify-content-end mt-1">
                 <div class="col-8"></div>
                 <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
@@ -149,9 +165,7 @@
         var newQty = currentQty + change;
 
         if (newQty <= 0) {
-            if (confirm('Apakah anda yakin ingin menghapus item ini?')) {
-                removeItemFromCart(itemId);
-            }
+            confirmRemoveItem(itemId);
             return;
         }
 
@@ -169,7 +183,7 @@
                 qtyInput.value = newQty;
                 location.reload();
             } else {
-                alert(data.message);
+                alert(data.message); //alert ijo: jumlah item berhasil diperbarui
             }
         })
         .catch((error) => {
@@ -179,6 +193,35 @@
     }
 
     // function untuk konfirmasi delete item + delete item dari keranjang pakai sweetalert2
+    function removeItemFromCart(itemId) {
+        fetch("{{ route('cart.remove') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ id: itemId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: data.message || 'Item berhasil dihapus',
+                timer: 1200,
+                showConfirmButton: false
+            });
+            setTimeout(() => location.reload(), 1500);
+        })
+        .catch(() => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message ||'Terjadi kesalahan saat menghapus item.'
+            });
+        });
+    }
+
     function confirmRemoveItem(itemId) {
         Swal.fire({
             title: 'Apakah Anda yakin?',
@@ -202,6 +245,22 @@
                 });
             }
         });
-    }
+
+    function confirmClearCart() {
+        Swal.fire({
+            title:'Apakah Anda yakin?',
+            text:'Semua item di keranjang akan dihapus!',
+            icon:'warning',
+            showCancelButton:true,
+            confirmButtonColor:'#d33',
+            cancelButtonColor:'#6c757d',
+            confirmButtonText:'Ya, hapus!',
+            cancelButtonText:'Batal'
+        }).then(result=>{
+            if(result.isConfirmed){
+                window.location.href = "{{ route('cart.clear') }}";
+            }
+    });
+}
 </script>
 @endsection

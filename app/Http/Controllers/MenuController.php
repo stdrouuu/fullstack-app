@@ -94,25 +94,26 @@ class MenuController extends Controller
         ]);
     }
 
-    // public function removeCart(Request $request)
-    // {
-    //     $itemId = $request->input('id');
+    public function removeCart(Request $request)
+    {
+        $itemId = $request->input('id');
+        $cart = Session::get('cart');
 
-    //     $cart = Session::get('cart');
+        if (isset($cart[$itemId])) {
+            unset($cart[$itemId]);
+            Session::put('cart', $cart);
 
-    //     if (isset($cart[$itemId])) {
-    //         unset($cart[$itemId]);
-    //         Session::put('cart', $cart);
+        Session::flash('danger', 'Item berhasil dihapus dari keranjang');
 
-    //     Session::flash('success', 'Item berhasil dihapus dari keranjang');
-
-    //     return response()->json(['success' => true]);
-    //     }
-    // }   
+        return response()->json([
+            'success' => true
+        ]);
+        }
+    }   
 
     public function clearCart()
     {
         Session::forget('cart');
-        return redirect()->route('cart')->with('success', 'Keranjang berhasil dikosongkan');
+        return redirect()->route('cart')->with('danger', 'Keranjang berhasil dikosongkan');
     }
 }
