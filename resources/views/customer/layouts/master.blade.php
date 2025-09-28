@@ -37,7 +37,10 @@
     <script src="{{ asset('assets/customer/js/main.js') }}"></script>
 
     <script>
-        document.getscripttById('currentYear').textContent = new Date().getFullYear();
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
+
+    @yield('script') 
+
     </body>
 </html>

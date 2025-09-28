@@ -14,7 +14,7 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         $tableNumber = $request->query('meja'); //qris di meja ketika discan akan muncul query ?meja=7
-        if(!$tableNumber) {
+        if ($tableNumber) {
             Session::put('tableNumber', $tableNumber); //simpan ke session
         }
 
@@ -26,7 +26,7 @@ class MenuController extends Controller
 
     public function cart() //untuk menyimpan data cart di session pada saat customer menekan tombol add to cart
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
         return view('customer.cart', compact('cart'));
     }
 
@@ -42,7 +42,8 @@ class MenuController extends Controller
             ]);
         }
 
-        $cart = Session::get('cart');
+        $cart = Session::get('cart', []);
+        
 
         //cek apakah cart kosong atau tidak
         if(isset($cart[$menuId])) { 
