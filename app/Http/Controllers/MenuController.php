@@ -103,7 +103,7 @@ class MenuController extends Controller
             unset($cart[$itemId]);
             Session::put('cart', $cart);
 
-        Session::flash('danger', 'Item berhasil dihapus dari keranjang');
+        Session::flash('danger', 'Item dihapus dari keranjang');
 
         return response()->json([
             'success' => true

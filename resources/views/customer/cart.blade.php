@@ -78,7 +78,7 @@
                                             readonly>
                                         <div class="input-group-btn">
                                             {{-- Ketika diklik akan menambahkan qty +1 --}}
-                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border" onclick="updateQuantity('{{ $item['id'] }}', 1)"">
+                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border" onclick="updateQuantity('{{ $item['id'] }}', 1)">
                                                 <i class="fa fa-plus"></i>
                                             </button>
                                         </div>
@@ -109,7 +109,7 @@
                 <a 
                 href="{{ route('cart.clear') }}" 
                 class="btn btn-danger" 
-                onclick="return confirmClearCart()">
+                onclick="event.preventDefault(); confirmClearCart();">
                 Kosongkan Keranjang
                 </a>
             </div>
@@ -157,7 +157,6 @@
 
 @section('script')
 <script>
-
     // function untuk tambah item ke keranjang
     function updateQuantity(itemId, change) {
         var qtyInput = document.getElementById('qty-' + itemId);
@@ -245,6 +244,7 @@
                 });
             }
         });
+    }
 
     function confirmClearCart() {
         Swal.fire({
@@ -256,11 +256,11 @@
             cancelButtonColor:'#6c757d',
             confirmButtonText:'Ya, hapus!',
             cancelButtonText:'Batal'
-        }).then(result=>{
+        }).then((result) => {
             if(result.isConfirmed){
                 window.location.href = "{{ route('cart.clear') }}";
             }
-    });
-}
+        });
+    }
 </script>
 @endsection
