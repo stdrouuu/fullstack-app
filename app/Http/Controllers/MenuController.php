@@ -204,10 +204,9 @@ class MenuController extends Controller
 
         Session::forget('cart'); 
 
-        return redirect()->route('menu')->with('success', 'Pesanan berhasil dibuat');
-
+        return redirect()->route('checkout.success', ['orderId' => $order->order_code])->with('success', 'Pesanan berhasil dibuat');
+    }
     //     if($request->payment_method == 'tunai') {
-    //         return redirect()->route('checkout.success', ['orderId' => $order->order_code])->with('success', 'Pesanan berhasil dibuat');
     //     } else {
     //         \Midtrans\Config::$serverKey = config('midtrans.server_key');
     //         \Midtrans\Config::$isProduction = config('midtrans.is_production');
@@ -243,23 +242,21 @@ class MenuController extends Controller
     //     }
     // }
 
-    // public function checkoutSuccess($orderId)
-    // {
-    //     $order = Order::where('order_code', $orderId)->first();
+    public function checkoutSuccess($orderId)
+    {
+        $order = Order::where('order_code', $orderId)->first();
 
-    //     if (!$order) {
-    //         return redirect()->route('menu')->with('error', 'Pesanan tidak ditemukan');
-    //     }
+        if (!$order) {
+            return redirect()->route('menu')->with('error', 'Pesanan tidak ditemukan');
+        }
 
-    //     $orderItems = OrderItem::where('order_id', $order->id)->get();
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
 
-    //     if ($order->payment_method == 'qris') {
-    //         $order->status  = 'settlement';
-    //         $order->save();
-    //     }
+        if ($order->payment_method == 'qris') {
+            $order->status  = 'settlement';
+            $order->save();
+        }
 
-    //     return view('customer.success', compact('order', 'orderItems'));
-
+        return view('customer.success', compact('order', 'orderItems'));
     }
 }
-
