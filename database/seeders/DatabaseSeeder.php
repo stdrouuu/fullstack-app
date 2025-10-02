@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // RoleSeeder::class, //seeder role
             // CategorySeeder::class, //seeder category
-            ItemSeeder::class, //factory item
-            // UserSeeder::class, //factory user
+            // ItemSeeder::class, //factory item
+            UserSeeder::class, //factory user
         ]);
     }
     // php artisan db:seed => push img to database, generate random data from seeder

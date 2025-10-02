@@ -13,7 +13,7 @@ class Order extends Model
         'user_id', 
         'subtotal', 
         'tax', 
-        'grand_total', 
+        'grandtotal', 
         'status', 
         'table_number', 
         'payment_method', 

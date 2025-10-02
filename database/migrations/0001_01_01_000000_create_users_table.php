@@ -11,10 +11,10 @@ return new class extends Migration
         // Modify
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->unique()->fillable();
+            $table->string('username')->unique()->nullable();
             $table->string('password')->nullable(); //customer cuma perlu nama dan no hp(gausa login)
             $table->string('fullname');
-            $table->string('email')->unique()->fillable();
+            $table->string('email')->unique()->nullable();
             $table->string('phone');
             $table->unsignedBigInteger('role_id'); //relasi tabel users dengan tabel roles
             $table->softDeletes(); //datanya tdk terhapus secara permanen 

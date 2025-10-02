@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('grandtotal');
             $table->enum('status', ['pending', 'settlement', 'cooked']);
             $table->integer('table_number');
-            $table->enum('payment method', ['tunai', 'qris']);
+            $table->enum('payment_method', ['tunai', 'qris']);
             $table->text('note')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -7,6 +7,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Models\Item;
+use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use App\Models\Order;
+use App\Models\OrderItem;
 
 
 class MenuController extends Controller
@@ -141,7 +145,7 @@ class MenuController extends Controller
             return redirect()->route('cart')->with('error', 'Keranjang masih kosong');
         }
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [ // agar customer tidak sembarangan mengetik nama dan nomor wa
             'fullname' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
         ]);
@@ -167,18 +171,20 @@ class MenuController extends Controller
             ];
         }
 
+        //simpan data user ke tabel user
         $user = User::firstOrCreate([
             'fullname' => $request->input('fullname'),
             'phone' => $request->input('phone'),
             'role_id' => 4
         ]);
 
+        //simpan data order ke tabel order
         $order = Order::create([
             'order_code' => 'ORD-'.$tableNumber.'-'. time(),
             'user_id' => $user->id,
             'subtotal' => $totalAmount,
             'tax' => 0.1 * $totalAmount,
-            'grand_total' => $totalAmount + (0.1 * $totalAmount),
+            'grandtotal' => $totalAmount + (0.1 * $totalAmount),
             'status' => 'pending',
             'table_number' => $tableNumber,
             'payment_method' => $request->payment_method,
@@ -196,61 +202,63 @@ class MenuController extends Controller
             ]);
         }
 
-        Session::forget('cart');
+        Session::forget('cart'); 
 
-        if($request->payment_method == 'tunai') {
-            return redirect()->route('checkout.success', ['orderId' => $order->order_code])->with('success', 'Pesanan berhasil dibuat');
-        } else {
-            \Midtrans\Config::$serverKey = config('midtrans.server_key');
-            \Midtrans\Config::$isProduction = config('midtrans.is_production');
-            \Midtrans\Config::$isSanitized = true;
-            \Midtrans\Config::$is3ds = true;
+        return redirect()->route('menu')->with('success', 'Pesanan berhasil dibuat');
 
-            $params = [
-                    'transaction_details' => [
-                        'order_id' => $order->order_code,
-                        'gross_amount' =>  (int) $order->grand_total,
-                ],
-                    'item_details' => $itemDetails,
-                    'customer_details' => [
-                        'first_name' => $user->fullname ?? 'Guest',
-                        'phone' => $user->phone,
-                ],
-                    'payment_type' => 'qris',
-            ];
+    //     if($request->payment_method == 'tunai') {
+    //         return redirect()->route('checkout.success', ['orderId' => $order->order_code])->with('success', 'Pesanan berhasil dibuat');
+    //     } else {
+    //         \Midtrans\Config::$serverKey = config('midtrans.server_key');
+    //         \Midtrans\Config::$isProduction = config('midtrans.is_production');
+    //         \Midtrans\Config::$isSanitized = true;
+    //         \Midtrans\Config::$is3ds = true;
 
-            try {
-                $snapToken = \Midtrans\Snap::getSnapToken($params);
-                return response()->json([
-                    'status' => 'success',
-                    'snap_token' => $snapToken,
-                    'order_code' => $order->order_code,
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Gagal membuat pesanan. Silakan coba lagi.'
-                ]);
-            }
-        }
-    }
+    //         $params = [
+    //                 'transaction_details' => [
+    //                     'order_id' => $order->order_code,
+    //                     'gross_amount' =>  (int) $order->grand_total,
+    //             ],
+    //                 'item_details' => $itemDetails,
+    //                 'customer_details' => [
+    //                     'first_name' => $user->fullname ?? 'Guest',
+    //                     'phone' => $user->phone,
+    //             ],
+    //                 'payment_type' => 'qris',
+    //         ];
 
-    public function checkoutSuccess($orderId)
-    {
-        $order = Order::where('order_code', $orderId)->first();
+    //         try {
+    //             $snapToken = \Midtrans\Snap::getSnapToken($params);
+    //             return response()->json([
+    //                 'status' => 'success',
+    //                 'snap_token' => $snapToken,
+    //                 'order_code' => $order->order_code,
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'status' => 'error',
+    //                 'message' => 'Gagal membuat pesanan. Silakan coba lagi.'
+    //             ]);
+    //         }
+    //     }
+    // }
 
-        if (!$order) {
-            return redirect()->route('menu')->with('error', 'Pesanan tidak ditemukan');
-        }
+    // public function checkoutSuccess($orderId)
+    // {
+    //     $order = Order::where('order_code', $orderId)->first();
 
-        $orderItems = OrderItem::where('order_id', $order->id)->get();
+    //     if (!$order) {
+    //         return redirect()->route('menu')->with('error', 'Pesanan tidak ditemukan');
+    //     }
 
-        if ($order->payment_method == 'qris') {
-            $order->status  = 'settlement';
-            $order->save();
-        }
+    //     $orderItems = OrderItem::where('order_id', $order->id)->get();
 
-        return view('customer.success', compact('order', 'orderItems'));
+    //     if ($order->payment_method == 'qris') {
+    //         $order->status  = 'settlement';
+    //         $order->save();
+    //     }
+
+    //     return view('customer.success', compact('order', 'orderItems'));
 
     }
 }
