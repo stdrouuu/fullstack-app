@@ -141,7 +141,14 @@ class MenuController extends Controller
         $cart = Session::get('cart');
         $tableNumber = Session::get('tableNumber');
 
-        if(empty($cart)) {
+        // if(empty($cart)) {
+        //     return redirect()->route('cart')->with('error', 'Keranjang masih kosong');
+        // }
+
+        if (empty($cart)) {
+            if ($request->ajax()) {
+                return response()->json(['status' => 'error', 'message' => 'Keranjang masih kosong'], 422);
+            }
             return redirect()->route('cart')->with('error', 'Keranjang masih kosong');
         }
 
@@ -150,11 +157,20 @@ class MenuController extends Controller
             'phone' => 'required|string|max:15',
         ]);
 
+        // if ($validator->fails()) {
+        //     return redirect()->route('checkout')->withErrors($validator);
+        // }
+
         if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['status' => 'error', 'errors' => $validator->errors()], 422);
+            }
             return redirect()->route('checkout')->withErrors($validator);
         }
 
+
         $total = 0;
+        
         foreach ($cart as $item) {
             $total += $item['price'] * $item['qty'];
         }
@@ -204,43 +220,42 @@ class MenuController extends Controller
 
         Session::forget('cart'); 
 
-        return redirect()->route('checkout.success', ['orderId' => $order->order_code])->with('success', 'Pesanan berhasil dibuat');
-    }
-    //     if($request->payment_method == 'tunai') {
-    //     } else {
-    //         \Midtrans\Config::$serverKey = config('midtrans.server_key');
-    //         \Midtrans\Config::$isProduction = config('midtrans.is_production');
-    //         \Midtrans\Config::$isSanitized = true;
-    //         \Midtrans\Config::$is3ds = true;
+        if($request->payment_method == 'tunai') {
+                return redirect()->route('checkout.success', ['orderId' => $order->order_code])->with('success', 'Pesanan berhasil dibuat');
+            } else {
+                \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                \Midtrans\Config::$isProduction = config('midtrans.is_production');
+                \Midtrans\Config::$isSanitized = true;
+                \Midtrans\Config::$is3ds = true; //3d secure
 
-    //         $params = [
-    //                 'transaction_details' => [
-    //                     'order_id' => $order->order_code,
-    //                     'gross_amount' =>  (int) $order->grand_total,
-    //             ],
-    //                 'item_details' => $itemDetails,
-    //                 'customer_details' => [
-    //                     'first_name' => $user->fullname ?? 'Guest',
-    //                     'phone' => $user->phone,
-    //             ],
-    //                 'payment_type' => 'qris',
-    //         ];
+                $params = [
+                        'transaction_details' => [
+                        'order_id' => $order->order_code,
+                        'gross_amount' =>  (int) $order->grandtotal,
+                    ],
+                        'item_details' => $itemDetails,
+                        'customer_details' => [
+                        'first_name' => $user->fullname ?? 'Guest',
+                        'phone' => $user->phone,
+                    ],
+                        'payment_type' => 'qris',
+                ];
 
-    //         try {
-    //             $snapToken = \Midtrans\Snap::getSnapToken($params);
-    //             return response()->json([
-    //                 'status' => 'success',
-    //                 'snap_token' => $snapToken,
-    //                 'order_code' => $order->order_code,
-    //             ]);
-    //         } catch (\Exception $e) {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => 'Gagal membuat pesanan. Silakan coba lagi.'
-    //             ]);
-    //         }
-    //     }
-    // }
+                try {
+                    $snapToken = \Midtrans\Snap::getSnapToken($params);
+                    return response()->json([
+                        'status' => 'success',
+                        'snap_token' => $snapToken,
+                        'order_code' => $order->order_code,
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Gagal membuat pesanan: ' . $e->getMessage()
+                    ]);
+                }
+            }
+        }
 
     public function checkoutSuccess($orderId)
     {

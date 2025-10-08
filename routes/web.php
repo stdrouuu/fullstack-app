@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\CategoryController;
+
+
 
 Route::get('/', function () {
     return redirect()->route('menu');
@@ -18,3 +21,15 @@ Route::get('/checkout', [MenuController::class, 'checkout'])->name('checkout');
 Route::post('/checkout/store', [MenuController::class, 'storeOrder'])->name('checkout.store');
 Route::get('/checkout/success/{orderId}', [MenuController::class, 'checkoutSuccess'])->name('checkout.success');
 
+
+//admin routes
+// buat cntroller = php artisan make:controller CategoryController --resource
+// Route::get('/dashboard', function () {
+//     return view('admin.dashboard');
+// })->name('dashboard');
+
+Route::resource('categories', CategoryController::class);
+Route::resource('items', itemController::class);
+Route::resource('roles', RoleController::class);
+Route::resource('users', UserController::class);
+Route::resource('orders', OrderController::class);
